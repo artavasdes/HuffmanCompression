@@ -53,8 +53,13 @@ public class HuffProcessor implements Processor {
      * the input file. */
     private int[] readForCounts(BitInputStream in)
     {
-        // TODO: Step 1
-        return new int[256];
+        int[] counts = new int[256];
+        int byt = in.read();
+        while(byt != -1){
+            counts[byt] ++;
+            byt = in.read();
+        }
+        return counts;
     }
 
 
@@ -75,8 +80,19 @@ public class HuffProcessor implements Processor {
      * PSEUDO_EOF and include it in the priority queue (and tree) as well.
      */
     private HuffNode makeTreeFromCounts(int[] array) {
-        // TODO: Step 2
-        return new HuffNode(-1,-1);
+        PriorityQueue<HuffNode> tree = new PriorityQueue<>();
+        for(int i = 0; i < array.length; i++){
+            if(array[i] != 0){
+                tree.add(new HuffNode(i, array[i]));
+            }
+        }
+        tree.add(new HuffNode(PSEUDO_EOF, 1));
+        while(tree.size() != 1){
+            HuffNode temp = tree.remove();
+            HuffNode temp2 = tree.remove();
+            tree.add(new HuffNode(-1, temp.weight() + temp2.weight(), temp, temp2));
+        }
+        return tree.remove();
     }
 
     /** Debugging method.
@@ -106,10 +122,14 @@ public class HuffProcessor implements Processor {
      * current encoding is added to the array.*/
 
     private String[] makeCodingsFromTree(HuffNode root) {
+        String[] characterArr = new String[257];
         // TODO: Step 3! You will need to create a helper recursive method
-        return new String[257];
+        return characterArr;
     }
 
+    public String[] makingCodingsFreeTree(HuffNode root){
+        return new String[1];
+    }
 
     /** Debugging method.
      * Prints the codings of the characters in the array [0-256].
