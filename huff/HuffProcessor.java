@@ -123,12 +123,20 @@ public class HuffProcessor implements Processor {
 
     private String[] makeCodingsFromTree(HuffNode root) {
         String[] characterArr = new String[257];
-        // TODO: Step 3! You will need to create a helper recursive method
+        makingCodingsNode(root, "", characterArr);
         return characterArr;
     }
 
-    public String[] makingCodingsFreeTree(HuffNode root){
-        return new String[1];
+    public void makingCodingsNode(HuffNode node, String code, String[] characterArr){
+        if(node == null){
+            return;
+        }
+        if (node.isLeaf() == true){
+            characterArr[node.value()] = code;
+            return;
+        }
+        makingCodingsNode(node.left(), code + "0", characterArr);
+        makingCodingsNode(node.right(), code + "1", characterArr);       
     }
 
     /** Debugging method.
@@ -152,7 +160,21 @@ public class HuffProcessor implements Processor {
      */
     private void writeHeader (HuffNode n, BitOutputStream out)
     {
-        // TODO: Step 4
+        writeHeaderT(n, out);
+    }
+
+    public void writeHeaderT(HuffNode n, BitOutputStream out){
+        if(n == null){
+            return;
+        }
+        if (n.isLeaf() == true){
+            out.writeBits(1, 1);
+            out.writeBits(9, n.value());
+            return;
+        }
+        out.writeBits(1, 0);
+        writeHeaderT(n.left(), out);
+        writeHeaderT(n.right(), out);
     }
 
     /** Write the body of the compressed file.  Read through the input stream 8 bits
@@ -167,7 +189,20 @@ public class HuffProcessor implements Processor {
      */
     private void writeCompressedBits(BitInputStream in, String[] codings, BitOutputStream out)
     {
-        // TODO: Step 5
+        int byt = in.read();
+        while(byt != -1){
+            String code = codings[byt];
+            for (int i = 0; i < code.length(); i++){
+                if (code.charAt(i) == '0'){
+                    out.writeBits(1, 0);
+                }
+                else{
+                    out.writeBits(1, 1);
+                }
+            }
+            byt = in.read();
+        }
+        return;
     }
 
 
@@ -194,8 +229,10 @@ public class HuffProcessor implements Processor {
      */
     HuffNode readHeader (BitInputStream in)
     {
-        // TODO: Step 6
-        return new HuffNode (-1, -1);
+        if(in.readBits(1) == 1){
+            return new HuffNode(in.readBits(9), -1);
+        }
+        return new HuffNode(-1, -1, readHeader(in), readHeader(in));
     }
 
     /** Reads the body of the compressed file.  Start at the root of the tree.
