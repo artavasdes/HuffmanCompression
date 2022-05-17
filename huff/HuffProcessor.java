@@ -243,9 +243,19 @@ public class HuffProcessor implements Processor {
      * (If the value of the leaf is PSEUDO_EOF, exit the function.)
      */
     private void readCompressedBits(HuffNode root, BitInputStream in, BitOutputStream out)
-    {
-        // TODO: Step 7
+    {   
+        if(root == null){
+            System.out.println("Something went down");
+        }
+        if(root.isLeaf() == true){
+            out.writeBits(8, root.value());
+            return;
+        }
+        if(in.readBits(1) == 1){
+            readCompressedBits(root.right(), in, out);
+        }
+        else{
+            readCompressedBits(root.left(), in, out);
+        }
     }
-
-
 }
