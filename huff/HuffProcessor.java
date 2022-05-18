@@ -89,7 +89,9 @@ public class HuffProcessor implements Processor {
         tree.add(new HuffNode(PSEUDO_EOF, 1));
         while(tree.size() != 1){
             HuffNode temp = tree.remove();
+            System.out.println(temp.value() +" " + temp.weight());
             HuffNode temp2 = tree.remove();
+            System.out.println(temp2.value() +" " + temp2.weight());
             tree.add(new HuffNode(-1, temp.weight() + temp2.weight(), temp, temp2));
         }
         return tree.remove();
